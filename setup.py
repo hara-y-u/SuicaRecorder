@@ -26,7 +26,8 @@ class NfcpyPackage:
         self.src_true_dirname = self.src_tarball[:-len('.tar.gz')]
         self.src_dirname = 'nfcpy'
         self.src_true_path = os.path.join(dist_dir, self.src_true_dirname)
-        self.src_path = os.path.join(dist_dir, self.src_dirname)
+        self.lib_true_path = os.path.join(self.src_true_path, 'nfc')
+        self.lib_path = os.path.join(dist_dir, 'nfc')
         self._cache_dir = cache_dir
         self.cache_file = os.path.join(self.cache_dir, self.src_tarball)
 
@@ -65,7 +66,7 @@ class NfcpyPackage:
     def install(self):
         'Install nfcpy.'
         self.extract_src(self.tarball, self.dist_dir)
-        os.symlink(self.src_true_path, self.src_path)
+        os.symlink(self.lib_true_path, self.lib_path)
 
 
 class CustomInstallCommand(install):
@@ -77,7 +78,7 @@ class CustomInstallCommand(install):
 
     def run(self):
         nfcpy = NfcpyPackage(
-            version='0.9.2',
+            version='0.9.1',
             dist_dir=CustomInstallCommand.SRC_DIR,
             cache_dir=CustomInstallCommand.TMP_DIR
         )
