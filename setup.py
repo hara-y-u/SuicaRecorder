@@ -8,57 +8,80 @@ import tarfile
 import shutil
 
 
-class CustomInstallCommand(install):
-    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-    TMP_DIR = os.path.join(PROJECT_ROOT, 'tmp')
-    SRC_DIR = os.path.join(PROJECT_ROOT, 'src')
-    NFCPY_VERSION = '0.9.2'
-    NFCPY_VERSION_TO_MINOR = '.'.join(NFCPY_VERSION.split('.')[0:2])
-    NFCPY_SRC_TARBALL = 'nfcpy-%s.tar.gz' % NFCPY_VERSION
-    NFCPY_SRC_URL = 'https://launchpad.net/nfcpy/%s/%s/+download/%s' \
-                    % (NFCPY_VERSION_TO_MINOR,
-                       NFCPY_VERSION,
-                       NFCPY_SRC_TARBALL)
-    TMP_NFCPY_SRC_TARBALL_PATH = os.path.join(TMP_DIR, NFCPY_SRC_TARBALL)
-    NFCPY_SRC_DIST = os.path.join(SRC_DIR, 'nfcpy')
+class NfcpyPackage:
+    'Nfcpy package manipulation.'
 
-    'Get tmp directory for project making it if not exists.'
-    def get_create_tmp_dir(self):
-        tmp_dir = CustomInstallCommand.TMP_DIR
-        if not os.path.exists(tmp_dir):
-            os.makedirs(tmp_dir)
-        return tmp_dir
+    TARFILE = 'nfcpy-%s.tar.gz'
+    SRC_URL = 'https://launchpad.net/nfcpy/%s/%s/+download/%s'
 
-    'Get nfcpy source tarball.'
-    def download_nfcpy(self, src_url, dist_path):
+    def __init__(self, version, dist_dir, cache_dir):
+        self.version = version
+        self.version_to_minor = '.'.join(version.split('.')[0:2])
+        self.src_tarball = NfcpyPackage.TARFILE % version
+        self.src_url = NfcpyPackage.SRC_URL \
+            % (self.version_to_minor,
+               self.version,
+               self.src_tarball)
+        self.dist_dir = dist_dir
+        self.src_true_dirname = self.src_tarball[:-len('.tar.gz')]
+        self.src_dirname = 'nfcpy'
+        self.src_true_path = os.path.join(dist_dir, self.src_true_dirname)
+        self.src_path = os.path.join(dist_dir, self.src_dirname)
+        self._cache_dir = cache_dir
+        self.cache_file = os.path.join(self.cache_dir, self.src_tarball)
+
+    @property
+    def cache_dir(self):
+        'Get cache directory for project making it if not exists.'
+        d = self._cache_dir
+        if not os.path.exists(d):
+            os.makedirs(d)
+        return d
+
+    @property
+    def tarball(self):
+        f = self.cache_file
+        if not os.path.exists(f):
+            self.download(self.src_url, f)
+        return f
+
+    def download(self, src_url, dist_path):
+        'Get nfcpy source tarball.'
         response = urllib2.urlopen(src_url)
         blob = response.read()
         file = open(dist_path, 'w')
         file.write(blob)
         file.close
 
-    'Extract nfcpy source.'
-    def extract_nfcpy_src(self, tarball_path, dist_path):
+    def extract_src(self, tarball_path, dist_path):
+        'Extract nfcpy source.'
         tar = tarfile.open(tarball_path)
         tar.extractall(dist_path)
         tar.close()
 
-    'Install nfcpy.'
-    def install_nfcpy(self):
-        src_url = CustomInstallCommand.NFCPY_SRC_URL
-        tarball = CustomInstallCommand.NFCPY_SRC_TARBALL
-        tmp_dir = self.get_create_tmp_dir()
-        tar_dist_path = os.path.join(tmp_dir, tarball)
-        src_dist_path = CustomInstallCommand.NFCPY_SRC_DIST
-        if not os.path.exists(tar_dist_path):
-            self.download_nfcpy(src_url, tar_dist_path)
-        if os.path.exists(src_dist_path):
-            shutil.rmtree(src_dist_path)
-        self.extract_nfcpy_src(tar_dist_path, src_dist_path)
+    def clean(self):
+        shutil.rmtree(self.cache_file)
 
-    'Customized setuptools install command - install nfcpy.'
+    def install(self):
+        'Install nfcpy.'
+        self.extract_src(self.tarball, self.dist_dir)
+        os.symlink(self.src_true_path, self.src_path)
+
+
+class CustomInstallCommand(install):
+    'Customized setuptools install command.'
+
+    ROOT = os.path.dirname(os.path.abspath(__file__))
+    TMP_DIR = os.path.join(ROOT, 'tmp')
+    SRC_DIR = os.path.join(ROOT, 'src')
+
     def run(self):
-        self.install_nfcpy()
+        nfcpy = NfcpyPackage(
+            version='0.9.2',
+            dist_dir=CustomInstallCommand.SRC_DIR,
+            cache_dir=CustomInstallCommand.TMP_DIR
+        )
+        nfcpy.install()
         install.run(self)
 
 

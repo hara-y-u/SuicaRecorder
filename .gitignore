@@ -1,3 +1,4 @@
-/src/nfcpy/
 /suicarecorder.egg-info/
 /tmp/
+/src/nfcpy
+/src/nfcpy-*/
