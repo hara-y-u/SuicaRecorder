@@ -5,31 +5,32 @@ import scrapelib
 import lxml.html
 import os
 import json
+from collections import OrderedDict
+
+BASE_URL = 'http://www.denno.net/SFCardFan/index.php?pageID=%s'
+REQ_PER_MIN = 10
+DATA_SCHEME = OrderedDict([
+    ('area_code', 'hex'), ('line_code', 'hex'), ('station_code', 'hex'),
+    ('company_name', 'string'), ('line_name', 'string'),
+    ('station_name', 'string'), ('note', 'string')
+])
+
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
+DATA_DIR = os.path.join(ROOT, 'data')
+DATA_FILE = 'station_codes.json'
+DATA_PATH = os.path.join(DATA_DIR, DATA_FILE)
 
 
 class StationCodeUpdator:
-    ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
-    DATA_DIR = os.path.join(ROOT, 'data')
-    DATA_FILE = 'station_codes.json'
-    DATA_PATH = os.path.join(DATA_DIR, DATA_FILE)
-
-    BASE_URL = 'http://www.denno.net/SFCardFan/index.php?pageID=%s'
-    REQ_PER_MIN = 10
-    DATA_SCHEME = [
-        'area_code', 'section_code', 'station_code',
-        'company_name', 'section_name', 'station_name',
-        'note'
-    ]
-
     def __init__(self):
         self.data = []
         self.scraper = scrapelib.Scraper(
-            requests_per_minute=StationCodeUpdator.REQ_PER_MIN
+            requests_per_minute=REQ_PER_MIN
         )
-        self.data_path = StationCodeUpdator.DATA_PATH
+        self.data_path = DATA_PATH
 
     def page_body(self, page=1):
-        url = StationCodeUpdator.BASE_URL % page
+        url = BASE_URL % page
         res = self.scraper.get(url)
         return res.text
 
@@ -37,11 +38,35 @@ class StationCodeUpdator:
         return lxml.html.fromstring(html)
 
     def text_from_td_node(self, td_node):
-        return td_node.text.encode('utf-8') if td_node.text else ''
+        return td_node.text.encode('utf-8') if td_node.text else None
+
+    def normalize_datum(self, key, value):
+        if not value:
+            return None
+
+        t = DATA_SCHEME[key]
+        try:
+            if t == 'hex':
+                return int(value, 16)
+            elif t == 'string':
+                return '%s' % value
+            else:
+                return value
+        except ValueError:
+            print 'Invalid value detected. Don\'t process:'
+            print '\t%s:%s' % (key, value)
+            return value
+
+    def normalize_data(self, data):
+        for key in data.keys():
+            val = data[key]
+            data[key] = self.normalize_datum(key, val)
+        return data
 
     def data_from_tr_node(self, tr_node):
         array = [self.text_from_td_node(td) for td in list(tr_node)]
-        return dict(zip(StationCodeUpdator.DATA_SCHEME, array))
+        data = dict(zip(DATA_SCHEME.keys(), array))
+        return self.normalize_data(data)
 
     def find_data(self, dom):
         trs = dom.xpath('//*[@id="add1"]/center/table/tr')
@@ -68,5 +93,7 @@ class StationCodeUpdator:
         print 'Saving data..'
         self.save(self.data)
 
-updator = StationCodeUpdator()
-updator.update()
+
+if __name__ == '__main__':
+    updator = StationCodeUpdator()
+    updator.update()
