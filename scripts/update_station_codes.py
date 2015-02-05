@@ -70,8 +70,9 @@ class StationCodeUpdator:
 
     def find_data(self, dom):
         trs = dom.xpath('//*[@id="add1"]/center/table/tr')
-        data = [self.data_from_tr_node(tr) for tr in trs]
-        return data[2:]  # first two rows contains meta data
+        # first two rows only contains meta data
+        data = [self.data_from_tr_node(tr) for tr in trs[2:]]
+        return data
 
     def find_max_page(self, dom):
         num = dom.xpath('//*[@id="add1"]/center/table/tr[1]/td/a[last()]')
