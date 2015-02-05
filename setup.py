@@ -91,7 +91,8 @@ setup(
     description='Suica Log Record Utility.',
     author='yukihiro hara',
     author_email='yukihr@gmail.com',
-    install_requires=['pyusb', 'cement'],
+    install_requires=['pyusb', 'cement',
+                      'scrapelib', 'lxml'],
     url='http://github.com/SuicaLogRecorder',
     cmdclass={
         'install': CustomInstallCommand,
