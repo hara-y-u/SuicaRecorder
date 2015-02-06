@@ -1,6 +1,4 @@
 *.pyc
 /suicarecorder.egg-info/
-/tmp/
-/src/nfc
 /nfcpy
 /nfc
