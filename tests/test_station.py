@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
-
 import unittest
 from suicarecorder.station import Station
 import suicarecorder.station as station
 
 
 class StationTest(unittest.TestCase):
-    def test__load_data(self):
-        self.assertIsNotNone(Station._load_data())
-        self.assertIsNotNone(Station.data)
+    def test__load_stations(self):
+        self.assertIsNotNone(Station._load_stations())
+        self.assertIsNotNone(Station.stations)
 
     def test_find_by_codes(self):
         self.assertEqual(
