@@ -6,6 +6,8 @@ import os
 import shutil
 from subprocess import call
 
+ROOT = os.path.dirname(os.path.abspath(__file__))
+
 
 class NfcpyPackage:
     'Nfcpy package manipulation.'
@@ -30,20 +32,16 @@ class NfcpyPackage:
     def install(self):
         'Install nfcpy.'
         self.branch_repo(self.dist_dir)
-        os.unlink(self.lib_path)
+        if os.path.exists(self.lib_path):
+            os.unlink(self.lib_path)
         os.symlink(self.lib_true_path, self.lib_path)
 
 
 class CustomInstallCommand(install):
     'Customized setuptools install command.'
 
-    ROOT = os.path.dirname(os.path.abspath(__file__))
-    SRC_DIR = os.path.join(ROOT, 'src')
-
     def run(self):
-        nfcpy = NfcpyPackage(
-            dist_dir=CustomInstallCommand.SRC_DIR
-        )
+        nfcpy = NfcpyPackage(dist_dir=ROOT)
         nfcpy.install()
         install.run(self)
 
@@ -55,7 +53,7 @@ setup(
     author='yukihiro hara',
     author_email='yukihr@gmail.com',
     install_requires=['pyusb', 'cement',
-                      'scrapelib', 'lxml'],
+                      'scrapelib', 'lxml', 'nose'],
     url='http://github.com/SuicaLogRecorder',
     cmdclass={
         'install': CustomInstallCommand,
