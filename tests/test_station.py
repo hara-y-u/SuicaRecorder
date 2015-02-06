@@ -7,7 +7,6 @@ import suicarecorder.station as station
 
 class StationTest(unittest.TestCase):
     def test__load_data(self):
-        self.assertIsNone(Station.data)
         self.assertIsNotNone(Station._load_data())
         self.assertIsNotNone(Station.data)
 
@@ -17,7 +16,9 @@ class StationTest(unittest.TestCase):
             0
         )
 
-    def test_station(self):
+
+class ModuleFnTest(unittest.TestCase):
+    def test_for_codes(self):
         self.assertEqual(
             station.for_codes(line_code=0, station_code=1).area_code,
             0
