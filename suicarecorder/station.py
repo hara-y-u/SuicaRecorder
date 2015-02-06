@@ -34,3 +34,7 @@ class Station(object):
                s['station_code'] is station_code):
                 return cls(s)
         return cls(cls.default)
+
+
+def for_codes(line_code, station_code):
+    return Station.find_by_codes(line_code, station_code)
