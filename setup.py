@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.install import install
 import os
 import shutil
@@ -49,12 +49,19 @@ class CustomInstallCommand(install):
 setup(
     name='suicarecorder',
     version='0.0.1',
+    packages='suicarecorder',
     description='Suica Log Record Utility.',
     author='yukihiro hara',
     author_email='yukihr@gmail.com',
-    install_requires=['pyusb', 'cement',
-                      'scrapelib', 'lxml', 'nose'],
-    url='http://github.com/SuicaLogRecorder',
+    license='MIT',
+    keywords='nfc suica finance',
+    install_requires=['pyusb>=1.0.0b2', 'cement',
+                      'scrapelib', 'lxml'],
+    tests_require=['nose'],
+    package_data={
+        '': ['*.json']
+    },
+    url='http://github.com/yukihr/SuicaRecorder',
     cmdclass={
         'install': CustomInstallCommand,
     }
