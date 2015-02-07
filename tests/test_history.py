@@ -8,10 +8,13 @@ import suicarecorder.station as station
 
 
 class HistoryTest(unittest.TestCase):
-    def test_from_block(self):
-        h = history.from_block(
+    def setUp(self):
+        self.history = history.from_block(
             binascii.unhexlify('050f000f1b4d0c4f0000f100000a6c00')
         )
+
+    def test_from_block(self):
+        h = self.history
 
         self.assertEqual(u'車載端末', unicode(h.console, encoding='utf-8'))
         self.assertEqual(u'バス', unicode(h.purpose, encoding='utf-8'))

@@ -5,21 +5,30 @@ import station
 import datetime
 
 CONSOLES = {
-    0x03: "精算機",
-    0x04: "携帯型端末",
-    0x05: "車載端末",
-    0x12: "券売機",
-    0x16: "改札機",
-    0x1c: "乗継精算機",
-    0xc8: "自販機"
+    0x03: u'精算機',
+    0x04: u'携帯型端末',
+    0x05: u'車載端末',
+    0x12: u'券売機',
+    0x16: u'改札機',
+    0x1c: u'乗継精算機',
+    0xc8: u'自販機'
 }
 
-PURPOSES = {
-    0x01: "運賃支払",
-    0x02: "チャージ",
-    0x0f: "バス",
-    0x46: "物販"
+PROCESSES = {
+    0x01: u'運賃支払',
+    0x02: u'チャージ',
+    0x0f: u'バス',
+    0x46: u'物販'
 }
+
+DEFAULT_FORMAT = u'''
+端末: %(console)s
+処理: %(process)s
+日付: %(date)s
+残高: %(balance)d
+入場: %(entered_station)s
+退場: %(exited_station)s
+'''
 
 
 class History(object):
@@ -49,8 +58,8 @@ class History(object):
         le = cls.process_as_little_endian(block)
 
         values = {
-            'console': CONSOLES.get(be[0], '不明端末'),
-            'purpose': PURPOSES.get(be[1], '不明用途'),
+            'console': CONSOLES.get(be[0], u'不明端末'),
+            'process': PROCESSES.get(be[1], u'不明用途'),
             'date': cls.date_from_bytes(be[3]),
             'balance': le[8],
             'entered_station': station.for_codes(be[4], be[5]),
@@ -58,6 +67,12 @@ class History(object):
         }
 
         return cls(values)
+
+    def format(self, text=None, data=None):
+        return (text or DEFAULT_FORMAT) % (data or self.__dict__)
+
+    def __str__(self):
+        return self.format(DEFAULT_FORMAT, self.__dict__)
 
 
 def from_block(block):

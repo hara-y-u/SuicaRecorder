@@ -24,9 +24,9 @@ class Station(object):
     def _load_stations(cls):
         if not cls.stations:
             cls.stations = []
-            f = open(DATA_PATH, 'r')
-            for data in json.load(f):
-                cls.stations.append(cls(data))
+            with open(DATA_PATH, 'r') as f:
+                for data in json.load(f, 'utf-8'):
+                    cls.stations.append(cls(data))
         return cls.stations
 
     @classmethod
@@ -43,6 +43,10 @@ class Station(object):
                s.station_code is station_code):
                 return s
         return cls.default_instance()
+
+    def __str__(self):
+        return '%(station_name)s [%(company_name)s-%(line_name)s]' % \
+            self.__dict__
 
 
 def for_codes(line_code, station_code):

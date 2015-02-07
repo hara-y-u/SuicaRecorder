@@ -58,6 +58,10 @@ setup(
     install_requires=['pyusb>=1.0.0b2', 'cement',
                       'scrapelib', 'lxml'],
     tests_require=['nose'],
+    entry_points={
+        'console_scripts':
+        'recordsuica = suicarecorder.cli:run'
+    },
     package_data={
         '': ['*.json']
     },
