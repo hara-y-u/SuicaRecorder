@@ -38,12 +38,12 @@ Suicaの履歴をテキストファイルに保存するためのユーティリ
 
 * [nfcpyでお手軽NFC開発[1/2]](http://techblog.qoncept.jp/?p=165)
 
-    nfcpyからRC-S380を扱えることを初めて知り、サンプルコードなども大変参考になりました。
+    nfcpyからRC-S380を扱えることを初めて知り、サンプルコードなども参考になりました。
 
 * [SFCardFan](http://www.denno.net/SFCardFan/index.php)
 
-    公開されている路線・駅コードのデータベースが大変役に立ちました。
+    公開されている路線・駅コードのデータベースが役に立ちました。
 
 * [FeliCa Library wiki](http://sourceforge.jp/projects/felicalib/wiki/suica)
 
-    データのフォーマットや、コードの種別などの貴重な情報を公開して頂いています。
+    データのフォーマットや、コードの種別などのまとまった情報が役立ちました。

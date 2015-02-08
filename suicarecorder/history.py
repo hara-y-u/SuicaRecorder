@@ -61,8 +61,7 @@ PROCESSES = {
     133: u'精算 (他社入場精算)'
 }
 
-DEFAULT_FORMAT = u'''
-端末: %(console)s
+DEFAULT_FORMAT = u'''端末: %(console)s
 処理: %(process)s
 日付: %(date)s
 残高: %(balance)d

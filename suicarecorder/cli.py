@@ -11,6 +11,7 @@ logger.addHandler(ch)
 
 
 def receive_histories(histories):
+    histories.reverse()
     for history in histories:
         print unicode('%s' % history)
 
