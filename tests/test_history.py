@@ -16,8 +16,8 @@ class HistoryTest(unittest.TestCase):
     def test_from_block(self):
         h = self.history
 
-        self.assertEqual(u'車載端末', unicode(h.console, encoding='utf-8'))
-        self.assertEqual(u'バス', unicode(h.purpose, encoding='utf-8'))
+        self.assertEqual(u'車載端末', h.console)
+        self.assertEqual(u'バス (IruCa系)', h.process)
         self.assertEqual(datetime.date(13, 10, 13), h.date)
         self.assertEqual(241, h.balance)
         self.assertEqual(station.for_codes(12, 79), h.entered_station)
