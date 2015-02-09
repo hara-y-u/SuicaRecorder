@@ -26,10 +26,7 @@ class Reader:
 
         return histories
 
-    def read_tag(self, callback):
-        self.clf.connect(rdwr={'on-connect': callback})
-
-    def read_histories(self, callback, num_blocks=NUM_BLOCKS):
+    def read_histories(self, callback):
         def receive_tag(tag):
             self.logger.debug('connect: %s' % tag)
             try:
@@ -37,9 +34,9 @@ class Reader:
             finally:
                 self.clf.close()
 
-        self.read_tag(receive_tag)
+        self.clf.connect(rdwr={'on-connect': receive_tag})
 
 
-def read_histories(callback, logger):
-    reader = Reader('usb', logger)
+def read_histories(callback, logger, device='usb'):
+    reader = Reader(device, logger)
     return reader.read_histories(callback)
