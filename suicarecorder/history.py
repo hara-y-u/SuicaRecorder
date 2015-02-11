@@ -61,13 +61,20 @@ PROCESSES = {
     133: u'精算 (他社入場精算)'
 }
 
-DEFAULT_FORMAT = u'''端末: %(console)s
+PRODUCT_SALES_PROCESSES = {70, 73, 74, 75, 198, 203}
+BUS_PROCESSES = {13, 15, 31, 35}
+
+DEFAULT_FORMAT = u'''History #%(id)s
+端末: %(console)s
 処理: %(process)s
 日付: %(date)s
+時刻: %(time)s
 残高: %(balance)d
 入場: %(entered_station)s
 退場: %(exited_station)s
 '''
+
+BLOCK_FORMAT = '2B2H4BH4B'
 
 
 class History(object):
@@ -77,33 +84,78 @@ class History(object):
 
     @classmethod
     def process_as_big_endian(cls, data):
-        return struct.unpack('>2B2H4BH4B', data)
+        return struct.unpack('>' + BLOCK_FORMAT, data)
 
     @classmethod
     def process_as_little_endian(cls, data):
-        return struct.unpack('<2B2H4BH4B', data)
+        return struct.unpack('<' + BLOCK_FORMAT, data)
 
     @classmethod
-    def date_from_bytes(cls, bytes_date):
+    def date_from_bytes(cls, date_bytes):
         return datetime.date(
-            year=(bytes_date >> 9) & 0x7f,
-            month=(bytes_date >> 5) & 0x0f,
-            day=(bytes_date >> 0) & 0x1f
+            year=((date_bytes >> 9) & 0x7f) + 2000,
+            month=(date_bytes >> 5) & 0x0f,
+            day=(date_bytes >> 0) & 0x1f
         )
+
+    @classmethod
+    def join_bytes(cls, bytes):
+        return int(''.join('%02x' % i for i in bytes), 16)
+
+    @classmethod
+    def time_from_bytes(cls, time_bytes):
+        return datetime.time(
+            hour=(time_bytes >> 11) & 0x1f,
+            minute=(time_bytes >> 5) & 0x3f
+        )
+
+    @classmethod
+    def default_values_from_blocks(cls, be, le):
+        console_num = be[0]
+        process_num = be[1]
+        return {
+            'console_num': console_num,
+            'console': CONSOLES.get(console_num, DEFAULT_CONSOLE),
+            'process_num': process_num,
+            'process': PROCESSES.get(process_num, DEFAULT_PROCESS),
+            'date': cls.date_from_bytes(be[3]),
+            'time': None,
+            'balance': le[8],
+            'entered_line_key': None,
+            'entered_station_key': None,
+            'entered_station': None,
+            'exited_line_key': None,
+            'exited_station_key': None,
+            'exited_station': None,
+            'id': cls.join_bytes([be[9], be[10], be[11]]),
+            'region': be[12]
+        }
 
     @classmethod
     def from_block(cls, block):
         be = cls.process_as_big_endian(block)
         le = cls.process_as_little_endian(block)
+        process_num = be[1]
 
-        values = {
-            'console': CONSOLES.get(be[0], DEFAULT_CONSOLE),
-            'process': PROCESSES.get(be[1], DEFAULT_PROCESS),
-            'date': cls.date_from_bytes(be[3]),
-            'balance': le[8],
-            'entered_station': station.for_codes(be[4], be[5]),
-            'exited_station': station.for_codes(be[6], be[7])
-        }
+        values = cls.default_values_from_blocks(be, le)
+
+        if process_num in PRODUCT_SALES_PROCESSES:
+            values.update({
+                'type': 'product_sales',
+                'time': cls.time_from_bytes(cls.join_bytes([be[4], be[5]]))
+            })
+        elif process_num in BUS_PROCESSES:
+            values.update({'type': 'bus'})
+        else:
+            values.update({
+                'type': 'train',
+                'entered_line_key': be[4],
+                'entered_station_key': be[5],
+                'entered_station': station.for_codes(be[4], be[5]),
+                'exited_line_key': be[6],
+                'exited_station_key': be[7],
+                'exited_station': station.for_codes(be[6], be[7])
+            })
 
         return cls(values)
 
