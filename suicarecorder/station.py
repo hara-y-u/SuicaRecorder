@@ -8,13 +8,13 @@ DATA_PATH = os.path.join(DATA_DIR, DATA_FILE)
 
 
 class Station(object):
-    stations = None
+    stations = []
     default = {
         'area_code': 0, 'line_code': 0, 'station_code': 0,
         'company_name': 'No Company', 'line_name': 'No Line',
         'station_name': 'No Station', 'note': ''
     }
-    _default = None
+    _default_instance = None
 
     def __init__(self, data):
         for k, v in data.items():
@@ -31,9 +31,9 @@ class Station(object):
 
     @classmethod
     def default_instance(cls):
-        if not cls._default:
-            cls._default = cls(cls.default)
-        return cls._default
+        if not cls._default_instance:
+            cls._default_instance = cls(cls.default)
+        return cls._default_instance
 
     @classmethod
     def find_by_codes(cls, line_code, station_code):
