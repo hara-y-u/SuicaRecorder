@@ -21,6 +21,7 @@ class HistoryTest(unittest.TestCase):
 
     def test_from_block(self):
         h = self.bus_history
+        self.assertEqual(u'bus', h.type)
         self.assertEqual(u'車載端末', h.console)
         self.assertEqual(u'バス (IruCa系)', h.process)
         self.assertEqual(datetime.date(2013, 10, 13), h.date)
@@ -31,6 +32,7 @@ class HistoryTest(unittest.TestCase):
         self.assertEqual(2668, h.id)
 
         h = self.product_sales_history
+        self.assertEqual(u'product_sales', h.type)
         self.assertEqual(u'物販端末', h.console)
         self.assertEqual(u'物販', h.process)
         self.assertEqual(datetime.date(2015, 2, 9), h.date)
@@ -41,6 +43,7 @@ class HistoryTest(unittest.TestCase):
         self.assertEqual(2205, h.id)
 
         h = self.train_history
+        self.assertEqual(u'train', h.type)
         self.assertEqual(u'改札機', h.console)
         self.assertEqual(u'運賃支払(改札出場)', h.process)
         self.assertEqual(datetime.date(2015, 2, 2), h.date)
