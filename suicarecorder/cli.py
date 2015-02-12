@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import reader
+import dummy_card_server
+from functools import wraps
 from cement.core import foundation, controller
 
 
@@ -13,31 +15,46 @@ class CliBaseController(controller.CementBaseController):
             (['--csv'], dict(action='store_true',
                              help='preffer csv format for output')),
             (['--dev'], dict(action='store_true',
-                             help='toggle development mode'))
+                             help='toggle development mode \
+                                   (emulates card touch)'))
         ]
 
-    @controller.expose(hide=True, aliases=['run'])
-    def default(self):
-        self.app.log.info('Inside base.default function.')
-        if self.app.pargs.format:
-            self.app.log.info("Recieved option 'format' with value '%s'." %
-                              self.app.pargs.format)
+    def prepare_dev(f):
+        @wraps(f)
+        def wrapper(*args, **kwds):
+            if args[0].app.pargs.dev:
+                dummy_card_server.start()
+            return f(*args, **kwds)
+        return wrapper
 
     def show_histories(self, histories):
         histories.reverse()
         for history in histories:
-            self.app.log.info(unicode('%s' % history))
+            if self.app.pargs.csv:
+                self.app.log.info(unicode(history.csv))
+            else:
+                self.app.log.info(unicode('%s' % history))
 
     def on_error(self, error):
         self.app.log.error('An error has occured on reading histories: %s' %
                            error)
 
-    @controller.expose(help='output suica histories to STDOUT.')
+    @controller.expose(hide=True, aliases=['run'])
+    @prepare_dev
+    def default(self):
+        self.app.log.info('Inside base.default function.')
+        if self.app.pargs.csv:
+            self.app.log.info("Recieved option 'format' with value '%s'." %
+                              self.app.pargs.csv)
+
+    @controller.expose(help='output suica histories to STDOUT')
+    @prepare_dev
     def show(self):
         reader.read_histories(
             self.show_histories,
             self.app.log,
-            self.on_error
+            self.on_error,
+            'udp' if self.app.pargs.dev else 'usb'
         )
 
 
