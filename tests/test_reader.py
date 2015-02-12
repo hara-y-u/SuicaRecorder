@@ -72,7 +72,7 @@ class ReaderTest(unittest.TestCase):
         touch_th.setDaemon(True)
         touch_th.start()
 
-        reader.read_histories(receive_histories, logger, 'udp')
+        reader.read_histories(receive_histories, logger, device='udp')
 
 
 if __name__ == '__main__':
