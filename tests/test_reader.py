@@ -16,11 +16,16 @@ class ReaderTest(unittest.TestCase):
         def receive_histories(histories):
             self.assertIsInstance(histories, list)
             self.assertEqual(len(histories), 20)
-            for history in histories:
+            for i, history in enumerate(histories):
+                if 0 < i:
+                    self.assertEqual(histories[i-1].previous, history)
                 self.assertIsInstance(history, History)
 
+        def on_error(e):
+            assert False
+
         dummy_card_server.start()
-        reader.read_histories(receive_histories, logger, device='udp')
+        reader.read_histories(receive_histories, logger, on_error, 'udp')
 
 
 if __name__ == '__main__':

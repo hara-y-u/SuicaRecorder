@@ -69,7 +69,9 @@ DEFAULT_FORMAT = u'''History #%(id)s
 処理: %(process)s
 日付: %(date)s
 時刻: %(time)s
-残高: %(balance)d
+支払: %(charge)s
+入金: %(deposit)s
+残高: %(balance)s
 入場: %(entered_station)s
 退場: %(exited_station)s
 '''
@@ -81,6 +83,7 @@ class History(object):
     def __init__(self, values):
         for k, v in values.items():
             self.__dict__[k] = v
+        self.previous = None
 
     @classmethod
     def process_as_big_endian(cls, data):
@@ -159,11 +162,39 @@ class History(object):
 
         return cls(values)
 
+    @property
+    def delta(self):
+        if self.previous:
+            return self.balance - self.previous.balance
+        else:
+            return None
+
+    @property
+    def charge(self):
+        if self.delta and self.delta < 0:
+            return -1 * self.delta
+        else:
+            return None
+
+    @property
+    def deposit(self):
+        if self.delta and self.delta > 0:
+            return self.delta
+        else:
+            return None
+
+    def attrs(self):
+        class_items = self.__class__.__dict__.iteritems()
+        props = dict((k, getattr(self, k))
+                     for k, v in class_items
+                     if isinstance(v, property))
+        return dict(props.items() + self.__dict__.items())
+
     def format(self, text=None, data=None):
-        return (text or DEFAULT_FORMAT) % (data or self.__dict__)
+        return (text or DEFAULT_FORMAT) % (data or self.attrs())
 
     def __str__(self):
-        return self.format(DEFAULT_FORMAT, self.__dict__)
+        return self.format(DEFAULT_FORMAT, self.attrs())
 
 
 def from_block(block):

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import reader
 import dummy_card_server
 from functools import wraps
@@ -31,9 +29,9 @@ class CliBaseController(controller.CementBaseController):
         histories.reverse()
         for history in histories:
             if self.app.pargs.csv:
-                self.app.log.info(unicode(history.csv))
+                print unicode(history.csv)
             else:
-                self.app.log.info(unicode('%s' % history))
+                print unicode(history)
 
     def on_error(self, error):
         self.app.log.error('An error has occured on reading histories: %s' %

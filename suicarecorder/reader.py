@@ -28,23 +28,32 @@ class Reader:
         histories = []
         for i in range(num_blocks):
             block = tag.read([i], SERVICE_CODE)
-            histories.append(history.from_block(block))
+            h = history.from_block(block)
+            if 0 < i:
+                histories[i-1].previous = h
+            histories.append(h)
         return histories
 
     def read_histories(self, callback, on_error):
         def receive_tag(tag):
-            self.logger.debug('connect: %s' % tag)
             try:
-                callback(self.histories_from_tag(tag))
+                self.logger.debug('connect: %s' % tag)
+                histories = self.histories_from_tag(tag)
             except Exception as e:
                 self.logger.error('%s' % e)
                 on_error(e)
             finally:
                 self.clf.close()
+            callback(histories)
 
-        return self.clf.connect(rdwr={'on-connect': receive_tag})
+        self.clf.connect(rdwr={'on-connect': receive_tag})
 
 
 def read_histories(callback, logger, on_error=lambda(e): False, device='usb'):
-    reader = Reader(device, logger)
+    try:
+        reader = Reader(device, logger)
+    except Exception as e:
+        logger.error('%s' % e)
+        on_error(e)
+
     return reader.read_histories(callback, on_error)
