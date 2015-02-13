@@ -166,22 +166,16 @@ class History(object):
     def delta(self):
         if self.previous:
             return self.balance - self.previous.balance
-        else:
-            return None
 
     @property
     def charge(self):
         if self.delta and self.delta < 0:
             return -1 * self.delta
-        else:
-            return None
 
     @property
     def deposit(self):
         if self.delta and self.delta > 0:
             return self.delta
-        else:
-            return None
 
     def attrs(self):
         class_items = self.__class__.__dict__.iteritems()
