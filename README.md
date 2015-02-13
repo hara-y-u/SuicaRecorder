@@ -1,7 +1,7 @@
 [WIP] SuicaRecorder
 ===================
 
-Suicaの履歴をテキストファイルに保存するためのユーティリティです（開発中）。
+Suicaの履歴をテキストファイルに保存するためのユーティリティです（開発中。なので以下の記述はあてになりません :bow: ）。
 
 
 インストール
@@ -33,7 +33,7 @@ Suicaの履歴をテキストファイルに保存するためのユーティリ
 
 * Suica
 
-その他、動く可能性のある端末については[nfcpyのドキュメントを参照してください](https://nfcpy.readthedocs.org/en/latest/overview.html#supported-hardware)。サービスは`ICOCA/PiTaPa/PASMO/TOICA`で動作する可能性があります。動作した端末・サービスをIssueで教えていただければこのリストに追記します（もちろん、プルリクエストでリストに追記してくれてもOKです:)）。
+その他、動く可能性のある端末については[nfcpyのドキュメントを参照してください](https://nfcpy.readthedocs.org/en/latest/overview.html#supported-hardware)。サービスは`ICOCA/PiTaPa/PASMO/TOICA`で動作する可能性があります。
 
 
 謝辞
