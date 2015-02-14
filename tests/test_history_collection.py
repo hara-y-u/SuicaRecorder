@@ -28,8 +28,9 @@ class HistoryCollectionTest(unittest.TestCase):
         hs = self.histories
         hs.brought_balance = 300
         hs.sort_by('id')
+        self.assertEqual(hs[0].previous.balance, 300)
+        self.assertEqual(hs[0].balance, 5859)
         self.assertEqual(hs[0].deposit, 5559)
-        assert 0
 
 
 if __name__ == '__main__':
