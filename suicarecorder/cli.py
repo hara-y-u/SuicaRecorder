@@ -2,6 +2,7 @@ import reader
 import dummy_card_server
 from functools import wraps
 from cement.core import foundation, controller
+from history import History
 
 
 class CliBaseController(controller.CementBaseController):
@@ -26,11 +27,13 @@ class CliBaseController(controller.CementBaseController):
         return wrapper
 
     def show_histories(self, histories):
+        if self.app.pargs.csv:
+            print unicode(History.csv_header)
         for history in histories:
             if self.app.pargs.csv:
-                print unicode(history.csv)
+                print unicode(history.to_csv())
             else:
-                print unicode(history)
+                print unicode(history) + '\n'
 
     def on_error(self, error):
         self.app.log.error('An error has occured on reading histories: %s' %

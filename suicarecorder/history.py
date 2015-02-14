@@ -2,7 +2,9 @@
 
 import struct
 import station
+import re
 import datetime
+from collections import OrderedDict
 
 DEFAULT_CONSOLE = u'不明端末'
 
@@ -64,17 +66,22 @@ PROCESSES = {
 PRODUCT_SALES_PROCESSES = {70, 73, 74, 75, 198, 203}
 BUS_PROCESSES = {13, 15, 31, 35}
 
-DEFAULT_FORMAT = u'''History #%(id)s
-端末: %(console)s
-処理: %(process)s
-日付: %(date)s
-時刻: %(time)s
-支払: %(charge)s
-入金: %(deposit)s
-残高: %(balance)s
-入場: %(entered_station)s
-退場: %(exited_station)s
-'''
+PROPERTIES = OrderedDict([
+    ('id', u'ID'),
+    ('console', u'端末'),
+    ('process', u'処理'),
+    ('date', u'日付'),
+    ('time', u'時刻'),
+    ('balance', u'残高'),
+    ('charge', u'支払'),
+    ('deposit', u'入金'),
+    ('entered_station', u'入場駅'),
+    ('exited_station', u'退場駅')
+])
+
+DEFAULT_FORMAT = \
+    '\n'.join(['%s: %s' % (v, '%(' + '%s' % k + ')s')
+               for k, v in PROPERTIES.items()])
 
 BLOCK_FORMAT = '2B2H4BH4B'
 
@@ -177,19 +184,41 @@ class History(object):
         if self.delta and self.delta > 0:
             return self.delta
 
+    @property
     def attrs(self):
         class_items = self.__class__.__dict__.iteritems()
         props = dict((k, getattr(self, k))
                      for k, v in class_items
-                     if isinstance(v, property))
+                     if k != 'attrs' and isinstance(v, property))
         return dict(props.items() + self.__dict__.items())
 
     def format(self, text=None, data=None):
-        return (text or DEFAULT_FORMAT) % (data or self.attrs())
+        return (text or DEFAULT_FORMAT) % (data or self.attrs)
 
     def __str__(self):
-        return self.format(DEFAULT_FORMAT, self.attrs())
+        return self.format(DEFAULT_FORMAT, self.attrs)
+
+    csv_header = ','.join(PROPERTIES.values())
+
+    def csv_value(self, key):
+        value = self.attrs.get(key)
+        if not value:
+            return ''
+        else:
+            return re.sub(',', '\,', '%s' % value)
+
+    def to_csv(self):
+        values = [self.csv_value(k) for k, v in PROPERTIES.items()]
+        return ','.join(values)
+
+    @classmethod
+    def from_list(cls, list):
+        return cls(dict(zip(PROPERTIES.keys(), list)))
 
 
 def from_block(block):
     return History.from_block(block)
+
+
+def from_list(list):
+    return History.from_list(list)

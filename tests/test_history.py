@@ -23,7 +23,7 @@ class HistoryTest(unittest.TestCase):
         )
         self.product_sales_history.previous = self.train_history
 
-    def test_from_block(self):
+    def test_init(self):
         h = self.bus_history
         self.assertEqual(u'bus', h.type)
         self.assertEqual(u'車載端末', h.console)
@@ -63,6 +63,21 @@ class HistoryTest(unittest.TestCase):
         self.assertEqual(None, h.exited_station)
         self.assertEqual(2205, h.id)
 
+    def test_to_csv(self):
+        h = self.train_history
+        self.assertEqual(
+            h.to_csv(),
+            u'2180,改札機,運賃支払(改札出場),2015-02-02,,5859,,5618,'
+            u'中野坂上 [東京地下鉄-4号線丸ノ内],銀座 [東京地下鉄-3号線銀座]'
+        )
+
+    def test_from_list(self):
+        h1 = self.train_history
+        csv_str1 = h1.to_csv()
+        list = csv_str1.split(',')
+        h2 = history.from_list(list)
+        csv_str2 = h2.to_csv()
+        self.assertEqual(csv_str1, csv_str2)
 
 if __name__ == '__main__':
     unittest.main()
