@@ -8,7 +8,7 @@ import logging
 
 
 class ReaderTest(unittest.TestCase):
-    def test_read_tistories(self):
+    def test_read_histories(self):
         logger = logging.getLogger(__name__)
         ch = logging.StreamHandler()
         logger.addHandler(ch)

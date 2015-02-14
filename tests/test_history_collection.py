@@ -11,11 +11,25 @@ class HistoryCollectionTest(unittest.TestCase):
         self.histories = HistoryCollection(hs)
 
     def test_sort_by(self):
-        hs = self.histories.sort_by('id')
-        print hs
+        hs = self.histories
+        hs.sort_by('id')
         for i, h in enumerate(hs):
             if 0 < i:
                 self.assertTrue(hs[i-1].id < h.id)
+
+    def test_prepare_previous(self):
+        hs = self.histories
+        hs.sort_by('id')
+        for i, h in enumerate(hs):
+            if i < len(hs) - 1:
+                self.assertEqual(hs[i+1].previous, h)
+
+    def test_brought_balance(self):
+        hs = self.histories
+        hs.brought_balance = 300
+        hs.sort_by('id')
+        self.assertEqual(hs[0].deposit, 5559)
+        assert 0
 
 
 if __name__ == '__main__':

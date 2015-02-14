@@ -1,22 +1,39 @@
 import history
 
 
+def sorted_by(collection, key, asc=True):
+    ret = sorted(collection, key=lambda h: getattr(h, key))
+    if not asc:
+        ret.reverse()
+    return ret
+
+
 class HistoryCollection(list):
     def __init__(self, histories):
         super(HistoryCollection, self).__init__(histories)
-        self.set_previous()
+        self._prepare_previous()
+        self._brought_balance = None
 
     def sort_by(self, key, asc=True):
-        res = sorted(self, key=lambda h: getattr(h, key))
+        self.sort(key=lambda h: getattr(h, key))
         if not asc:
-            res.reverse()
-        return res
+            self.reverse()
 
-    def set_previous(self):
-        hs = self.sort_by('id', asc=False)
+    def _prepare_previous(self):
+        hs = sorted_by(self, 'id', asc=False)
         for i, h in enumerate(hs):
             if 0 < i:
                 hs[i-1].previous = h
+
+    @property
+    def brought_balance(self):
+        return self._brought_balance
+
+    @brought_balance.setter
+    def brought_balance(self, balance):
+        hs = sorted_by(self, 'id')
+        hs[0].previous = history.History({'balance': balance})
+        self._brought_balance = balance
 
     @classmethod
     def from_blocks(cls, blocks):

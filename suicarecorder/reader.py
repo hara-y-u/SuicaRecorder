@@ -29,7 +29,10 @@ class Reader:
         for i in range(num_blocks):
             block = tag.read([i], SERVICE_CODE)
             blocks.append(block)
-        return history_collection.from_blocks(blocks).sort_by('id')
+
+        hs = history_collection.from_blocks(blocks)
+        hs.sort_by('id')
+        return hs
 
     def read_histories(self, callback, on_error):
         def receive_tag(tag):
