@@ -1,5 +1,5 @@
 import nfc
-import history
+import history_collection
 
 NUM_BLOCKS = 20
 SERVICE_CODE = 0x090f
@@ -25,14 +25,11 @@ class Reader:
             raise UnsupportedTagError(tag.__class__)
             return
 
-        histories = []
+        blocks = []
         for i in range(num_blocks):
             block = tag.read([i], SERVICE_CODE)
-            h = history.from_block(block)
-            if 0 < i:
-                histories[i-1].previous = h
-            histories.append(h)
-        return histories
+            blocks.append(block)
+        return history_collection.from_blocks(blocks).sort_by('id')
 
     def read_histories(self, callback, on_error):
         def receive_tag(tag):

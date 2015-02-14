@@ -17,8 +17,8 @@ class ReaderTest(unittest.TestCase):
             self.assertIsInstance(histories, list)
             self.assertEqual(len(histories), 20)
             for i, history in enumerate(histories):
-                if 0 < i:
-                    self.assertEqual(histories[i-1].previous, history)
+                if i < len(histories) - 1:
+                    self.assertEqual(histories[i+1].previous, history)
                 self.assertIsInstance(history, History)
 
         def on_error(e):

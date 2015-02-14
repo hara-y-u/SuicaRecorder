@@ -26,7 +26,6 @@ class CliBaseController(controller.CementBaseController):
         return wrapper
 
     def show_histories(self, histories):
-        histories.reverse()
         for history in histories:
             if self.app.pargs.csv:
                 print unicode(history.csv)
