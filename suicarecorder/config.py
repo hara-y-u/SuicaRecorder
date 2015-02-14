@@ -26,9 +26,7 @@ class Config(dict):
         return self._dict
 
     def load(self):
-        data = dict(DEFAULTS.items() + self.dict.items())
-
-        for k, v in data.items():
+        for k, v in self.dict.items():
             self.__setitem__(k, v)
 
         return self
