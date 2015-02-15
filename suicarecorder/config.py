@@ -1,7 +1,7 @@
 import os
 import json
 
-BASE_DIR = '~/.suicarecorder'
+BASE_DIR = os.path.expanduser('~/.suicarecorder')
 
 FILE_PATH = os.path.join(BASE_DIR, 'config.json')
 
@@ -25,9 +25,16 @@ class Config(dict):
                 self._dict = {}
         return self._dict
 
+    def normalize_value(self, key, value):
+        if key == 'output_dir':
+            return os.path.expanduser(value)
+        else:
+            return value
+
     def load(self):
         for k, v in self.dict.items():
-            self.__setitem__(k, v)
+            _v = self.normalize_value(k, v)
+            self.__setitem__(k, _v)
 
         return self
 
