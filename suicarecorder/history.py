@@ -208,7 +208,7 @@ class History(object):
             return re.sub(',', '\,', '%s' % value)
 
     def to_csv(self):
-        values = [self.csv_value(k) for k, v in PROPERTIES.items()]
+        values = [self.csv_value(k) for k in PROPERTIES.keys()]
         return ','.join(values)
 
     @classmethod
