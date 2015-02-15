@@ -28,6 +28,8 @@ class ConfigModuleTest(unittest.TestCase):
                          os.path.expanduser('~/.suicarecorder-test'))
         self.assertEqual(config.get('hoge', CONFIG_FILE),
                          'This has no default')
+        self.assertEqual(config.get('none', CONFIG_FILE), None)
+        self.assertEqual(config.get('none'), None)
 
 
 if __name__ == '__main__':
