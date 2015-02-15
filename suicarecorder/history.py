@@ -67,20 +67,20 @@ PRODUCT_SALES_PROCESSES = {70, 73, 74, 75, 198, 203}
 BUS_PROCESSES = {13, 15, 31, 35}
 
 PROPERTIES = OrderedDict([
-    ('id', u'ID'),
-    ('console', u'端末'),
-    ('process', u'処理'),
-    ('date', u'日付'),
-    ('time', u'時刻'),
-    ('balance', u'残高'),
-    ('charge', u'支払'),
-    ('deposit', u'入金'),
-    ('entered_station', u'入場駅'),
-    ('exited_station', u'退場駅')
+    ('id',              {'name': u'ID',   'type': 'int'}),
+    ('console',         {'name': u'端末',  'type': 'string'}),
+    ('process',         {'name': u'処理',  'type': 'string'}),
+    ('date',            {'name': u'日付',  'type': 'date'}),
+    ('time',            {'name': u'時刻',  'type': 'time'}),
+    ('balance',         {'name': u'残高',  'type': 'int'}),
+    ('charge',          {'name': u'支払',  'type': 'int'}),
+    ('deposit',         {'name': u'入金',  'type': 'int'}),
+    ('entered_station', {'name': u'入場駅', 'type': 'string'}),
+    ('exited_station',  {'name': u'退場駅', 'type': 'string'})
 ])
 
 DEFAULT_FORMAT = \
-    '\n'.join(['%s: %s' % (v, '%(' + '%s' % k + ')s')
+    '\n'.join(['%s: %s' % (v['name'], '%(' + '%s' % k + ')s')
                for k, v in PROPERTIES.items()])
 
 BLOCK_FORMAT = '2B2H4BH4B'
@@ -198,7 +198,7 @@ class History(object):
     def __str__(self):
         return self.format(DEFAULT_FORMAT, self.attrs)
 
-    csv_header = ','.join(PROPERTIES.values())
+    csv_header = ','.join([v['name'] for v in PROPERTIES.values()])
 
     def csv_value(self, key):
         value = self.attrs.get(key)
@@ -212,8 +212,27 @@ class History(object):
         return ','.join(values)
 
     @classmethod
+    def normalize_string_value(cls, key, value):
+        ret = None
+        if value == '':
+            return (key, ret)
+
+        type = PROPERTIES.get(key)['type']
+        if type == 'int':
+            ret = int(value)
+        elif type == 'date':
+            ret = datetime.datetime.strptime(value, '%Y-%m-%d').date()
+        elif type == 'time':
+            ret = datetime.datetime.strptime(value, '%H:%M:%S').time()
+        else:
+            ret = u'%s' % value
+        return (key, ret)
+
+    @classmethod
     def from_list(cls, list):
-        return cls(dict(zip(PROPERTIES.keys(), list)))
+        h = dict(zip(PROPERTIES.keys(), list))
+        return cls(dict([cls.normalize_string_value(k, v)
+                         for k, v in h.items()]))
 
 
 def from_block(block):

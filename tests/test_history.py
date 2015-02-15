@@ -77,6 +77,9 @@ class HistoryTest(unittest.TestCase):
         list = csv_str1.split(',')
         h2 = history.from_list(list)
         csv_str2 = h2.to_csv()
+        self.assertIsInstance(h2.id, int)
+        self.assertIsInstance(h2.console, unicode)
+        self.assertIsInstance(h2.date, datetime.date)
         self.assertEqual(csv_str1, csv_str2)
 
 if __name__ == '__main__':
