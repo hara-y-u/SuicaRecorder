@@ -33,7 +33,18 @@ Suicaの履歴をテキストファイルに保存するためのユーティリ
 
 * Suica
 
-その他、動く可能性のある端末については[nfcpyのドキュメントを参照してください](https://nfcpy.readthedocs.org/en/latest/overview.html#supported-hardware)。サービスは`ICOCA/PiTaPa/PASMO/TOICA`で動作する可能性があります。
+その他、動く可能性のある端末については[nfcpyのドキュメントを参照してください](https://nfcpy.readthedocs.org/en/latest/overview.html#supported-hardware)。サービスは`Suica/ICOCA/PiTaPa/PASMO/TOICA`で動作する可能性があります。
+
+
+開発
+---
+
+### テスト実行
+
+```sh
+$ cd SuicaRecorder
+$ nosetest
+```
 
 
 謝辞
