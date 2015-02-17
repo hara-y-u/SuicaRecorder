@@ -62,7 +62,7 @@ class DummyCardServer:
             self.thread.start()
             return self.thread
         else:
-            False
+            return False
 
 
 def start():
