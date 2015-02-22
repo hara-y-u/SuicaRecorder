@@ -49,7 +49,7 @@ class CustomInstallCommand(install):
 setup(
     name='suicarecorder',
     version='0.0.1',
-    packages='suicarecorder',
+    packages=['suicarecorder'],
     description='Suica Log Record Utility.',
     author='yukihiro hara',
     author_email='yukihr@gmail.com',
