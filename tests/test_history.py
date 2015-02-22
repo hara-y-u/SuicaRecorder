@@ -5,6 +5,7 @@ import suicarecorder.history as history
 import binascii
 import datetime
 import suicarecorder.station as station
+from prettyprint import pp, pp_str
 
 
 class HistoryTest(unittest.TestCase):
@@ -68,7 +69,7 @@ class HistoryTest(unittest.TestCase):
         self.assertEqual(
             h.to_csv(),
             u'2180,改札機,運賃支払(改札出場),2015-02-02,,5859,,5618,'
-            u'中野坂上 [東京地下鉄-4号線丸ノ内],銀座 [東京地下鉄-3号線銀座]'
+            u'中野坂上(東京地下鉄-4号線丸ノ内),銀座(東京地下鉄-3号線銀座)'
         )
 
     def test_from_list(self):
@@ -80,6 +81,14 @@ class HistoryTest(unittest.TestCase):
         self.assertIsInstance(h2.id, int)
         self.assertIsInstance(h2.console, unicode)
         self.assertIsInstance(h2.date, datetime.date)
+        self.assertEqual(
+            h2.entered_station,
+            station.for_station_string(u'中野坂上(東京地下鉄-4号線丸ノ内)')
+        )
+        self.assertEqual(
+            h2.exited_station,
+            station.for_station_string(u'銀座(東京地下鉄-3号線銀座)')
+        )
         self.assertEqual(csv_str1, csv_str2)
 
 if __name__ == '__main__':

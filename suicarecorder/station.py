@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, 'data')
@@ -36,18 +37,45 @@ class Station(object):
         return cls._default_instance
 
     @classmethod
-    def find_by_codes(cls, line_code, station_code):
+    def find(cls, attrs):
         stations = cls._load_stations()
         for s in stations:
-            if(s.line_code is line_code and
-               s.station_code is station_code):
+            if all(s.__dict__[k] == v for k, v in attrs.items()):
                 return s
         return cls.default_instance()
 
+    @classmethod
+    def find_by_codes(cls, line_code, station_code):
+        return cls.find({
+            'line_code': line_code,
+            'station_code': station_code
+        })
+
+    @classmethod
+    def find_by_names(cls, station_name, company_name, line_name):
+        return cls.find({
+            'station_name': station_name,
+            'company_name': company_name,
+            'line_name': line_name
+        })
+
+    @classmethod
+    def find_by_station_string(cls, station_string):
+        match = re.match(u'(?P<station>[\w]+)'
+                         u'\((?P<company>[\w]+)\-(?P<line>[\w]+)\)',
+                         station_string, re.U)
+        return cls.find_by_names(match.group('station'),
+                                 match.group('company'),
+                                 match.group('line'))
+
     def __str__(self):
-        return '%(station_name)s [%(company_name)s-%(line_name)s]' % \
+        return '%(station_name)s(%(company_name)s-%(line_name)s)' % \
             self.__dict__
 
 
 def for_codes(line_code, station_code):
     return Station.find_by_codes(line_code, station_code)
+
+
+def for_station_string(station_string):
+    return Station.find_by_station_string(station_string)

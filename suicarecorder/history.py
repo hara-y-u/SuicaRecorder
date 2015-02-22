@@ -75,8 +75,8 @@ PROPERTIES = OrderedDict([
     ('balance',         {'name': u'残高',  'type': 'int'}),
     ('charge',          {'name': u'支払',  'type': 'int'}),
     ('deposit',         {'name': u'入金',  'type': 'int'}),
-    ('entered_station', {'name': u'入場駅', 'type': 'string'}),
-    ('exited_station',  {'name': u'退場駅', 'type': 'string'})
+    ('entered_station', {'name': u'入場駅', 'type': 'station'}),
+    ('exited_station',  {'name': u'退場駅', 'type': 'station'})
 ])
 
 DEFAULT_FORMAT = \
@@ -224,6 +224,8 @@ class History(object):
             ret = datetime.datetime.strptime(value, '%Y-%m-%d').date()
         elif type == 'time':
             ret = datetime.datetime.strptime(value, '%H:%M:%S').time()
+        elif type == 'station':
+            ret = station.for_station_string(value)
         else:
             ret = u'%s' % value
         return (key, ret)
