@@ -236,6 +236,11 @@ class History(object):
         return cls(dict([cls.normalize_string_value(k, v)
                          for k, v in h.items()]))
 
+    @classmethod
+    def from_csv_string(cls, csv_string):
+        values = csv_string.split(',')
+        return cls.from_list(values)
+
 
 def from_block(block):
     return History.from_block(block)
@@ -243,3 +248,7 @@ def from_block(block):
 
 def from_list(list):
     return History.from_list(list)
+
+
+def from_csv_string(csv_string):
+    return History.from_csv_string(csv_string)
